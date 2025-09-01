@@ -1,35 +1,40 @@
-CXX = g++
-CXXFLAGS = -Wall --std=c++17
+# --- Kompilator i flagi ---
+CXX := g++
+CXXFLAGS := -std=gnu++17 -O2 -Wall -Wextra -I.
 
-all: clean main test_article test_book test_chapter test_author
+# --- Wspólne źródła Twoich klas ---
+SRC := author.cpp article.cpp chapter.cpp book.cpp
+OBJ := $(SRC:.cpp=.o)
 
-main: main.cpp chapter.cpp author.cpp article.cpp book.cpp
-	$(CXX) $(CXXFLAGS) main.cpp chapter.cpp author.cpp article.cpp book.cpp -o main.o
-	./main.o
+# --- Catch2 (ma main()) ---
+CATCH := catch_amalgamated.cpp
 
-comp_test_article: test_article.cpp article.cpp author.cpp catch_amalgamated.cpp
-	$(CXX) $(CXXFLAGS) test_article.cpp article.cpp author.cpp catch_amalgamated.cpp -o test_article.o
+# --- Domyślny cel ---
+.PHONY: all
+all: test_author test_article test_chapter test_book app
 
-comp_test_book: test_book.cpp book.cpp chapter.cpp author.cpp article.cpp catch_amalgamated.cpp
-	$(CXX) $(CXXFLAGS) test_book.cpp book.cpp chapter.cpp author.cpp article.cpp catch_amalgamated.cpp -o test_book.o
+# --- Reguła ogólna dla .o ---
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-comp_test_chapter: test_chapter.cpp chapter.cpp author.cpp article.cpp catch_amalgamated.cpp
-	$(CXX) $(CXXFLAGS) test_chapter.cpp chapter.cpp author.cpp article.cpp catch_amalgamated.cpp -o test_chapter.o
+# --- Testy ---
+test_author: $(OBJ) $(CATCH) test_author.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-comp_test_author: test_author.cpp author.cpp catch_amalgamated.cpp
-	$(CXX) $(CXXFLAGS) test_author.cpp author.cpp catch_amalgamated.cpp -o test_author.o
+test_article: $(OBJ) $(CATCH) test_article.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-test_article: comp_test_article
-	./test_article.o
+test_chapter: $(OBJ) $(CATCH) test_chapter.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-test_book: comp_test_book
-	./test_book.o
+test_book: $(OBJ) $(CATCH) test_book.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-test_chapter: comp_test_chapter
-	./test_chapter.o
+# --- Twoja aplikacja z main.cpp (nie uruchamiamy jej automatycznie) ---
+app: $(OBJ) main.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-test_author: comp_test_author
-	./test_author.o
-
+# --- Sprzątanie ---
+.PHONY: clean
 clean:
-	rm -f main test_article test_book test_chapter test_author
+	rm -f *.o test_author test_article test_chapter test_book app
