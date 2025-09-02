@@ -4,7 +4,6 @@
 #include "author.h"
 #include "chapter.h"
 
-// Udostępniamy nazwę 'vector' testom (tak używają: vector<Chapter>)
 using std::vector;
 
 class Book {
