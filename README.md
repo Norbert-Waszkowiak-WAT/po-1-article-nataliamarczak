@@ -20,7 +20,7 @@ make test_article
 make test_chapter
 make test_book
 ```
-## Sprawdzenie czy działa w terminalu
+## Odpalenie ponowne bez rekompilacji
 ```bash
 ./test_author
 ./test_article
